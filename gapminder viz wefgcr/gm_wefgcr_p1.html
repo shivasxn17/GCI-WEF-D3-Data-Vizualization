@@ -22,21 +22,25 @@
         <body>
             
     		<script>
+        // Chart dimensions.
+        var margin = {top: 30, right: 30, bottom: 30, left: 40};
         var data;
-    		var h = 600;
-    		var w = 1200;
+    		var w = 1200 - margin.right;
+        var h = 600 - margin.top - margin.bottom;
         var buffer = 20;
         var svg;
-        var xScale;
-        var yScale;
-        var rScale;
-        var cScale;
+        var xScale, yScale, rScale, cScale;
         var yearCount = 0;
         var initialTimer;
         var selected;
-        var font = '"Helvetica Neue", Helvetica, Arial, sans-serif';
-            
-       
+        var font = '"Bariol Regular",Lucida Sans Unicode,Lucida Grande,sans-serif';
+
+        // svg for main canvas
+        var main_svg = d3.select("body").append("svg")
+          .attr("width", w + margin.left + margin.right)
+          .attr("height", h + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             
     		d3.csv("GCI_CompleteData4_test_dataset.csv", function(error, dataset) {
           if(error) {
@@ -61,25 +65,19 @@
             });
           }
 
-                // scaling the attribute values
-                var minGDP = d3.min(data, function(d) {
-                              return +d.GDP; 
-                            });
-                var maxGDP = d3.max(data, function(d) {
-                              return +d.GDP; 
-                            });
-                var minGCI = d3.min(data, function(d) {
-                              return +d.Global_Competitiveness_Index; 
-                            });
-                var maxGCI = d3.max(data, function(d) {
-                              return +d.Global_Competitiveness_Index; 
-                            });
-                var minPop = d3.min(data, function(d) {
-                              return +d.Population; 
-                            });
-                var maxPop = d3.max(data, function(d) {
-                              return +d.Population; 
-                            });
+            // scaling the attribute values
+            var minGDP = d3.min(data, function(d) {
+                          return +d.GDP; });
+            var maxGDP = d3.max(data, function(d) {
+                          return +d.GDP; });
+            var minGCI = d3.min(data, function(d) {
+                          return +d.Global_Competitiveness_Index; });
+            var maxGCI = d3.max(data, function(d) {
+                          return +d.Global_Competitiveness_Index; });
+            var minPop = d3.min(data, function(d) {
+                          return +d.Population; });
+            var maxPop = d3.max(data, function(d) {
+                          return +d.Population; });
                     
             //console.log(minGDP);
 
@@ -104,10 +102,57 @@
 
             // linear scale for year
             yearScale = d3.scaleLinear().domain([70, 336])
-                            .range([0,130]);
+                        .range([0,130]);
 
-    })</script>
+            // x axis GDP
+            var gdp_axis = d3.axisBottom(xScale);
+            gdp_axis.tickArguments([10, "d"]);
 
-   
-    </body>
-    </html>
+            // y axis GCI
+            var gci_axis = d3.axisLeft(yScale);
+            gci_axis.tickArguments([4]);
+
+            var formatAsWholeNum = d3.format("d");
+
+            // attaching both x and y axis to main svg 
+            main_svg.append("g").attr("transform", "translate(0," + 
+                     (h-buffer) + ")").call(gdp_axis);
+            
+            main_svg.append("g").attr("transform", "translate(" + 
+                     buffer + ",0)").call(gci_axis);
+
+            // adding  main-label for GDP on x-axis
+            main_svg.append("text").attr("text-anchor", "middle")
+                    .text("Income")
+                    .attr("x", w-(w/2)).attr("y", h + (h/20))
+                    .attr("font-size", 25).style('font-family', font)
+                    .attr("fill", "#073F59").style("opacity", 0.8);
+
+            // adding  mini-label for GDP on x-axis
+            main_svg.append("text").attr("text-anchor", "end")
+                    .text("per person (GDP/capita,PPPS inflation-adjusted)")
+                    .attr("x", w-(w/40)).attr("y", h - (h/22))
+                    .attr("font-size", 13).attr("font-family", font)
+                    .attr("fill", "#073F59").style("opacity", 0.8);
+
+            // adding  main-label for GCI on y-axis
+            main_svg.append("text").attr("text-anchor", "middle")
+                    .text("Global Competitiveness Index")
+                    .attr("x", -(w/5)).attr("font-size", 21)
+                    .style('font-family', font).attr("fill", "#073F59")
+                    .style("opacity", 0.8).attr("transform", "rotate(-90)");
+
+            // adding mini-label for Global comp score on y-axis
+            main_svg.append("text").attr("text-anchor", "end")
+                    .text("Score")
+                    .attr("x", -(w/30)).attr("y", buffer*2)
+                    .attr("font-size", 13).attr("font-family", font)
+                    .attr("fill", "#073F59").attr("transform", "rotate(-90)")
+                    .style("opacity", 0.8);
+
+                
+
+    });
+    </script>
+  </body>
+</html>
