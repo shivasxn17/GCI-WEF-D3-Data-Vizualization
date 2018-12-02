@@ -38,44 +38,75 @@
             
        
             
-    		d3.csv("../data/GCI_CompleteData4.csv", function(error, dataset) {
-
+    		d3.csv("GCI_CompleteData4_test_dataset.csv", function(error, dataset) {
           if(error) {
-            console.log(error)
+            console.log(error);
           } else {
-
             data = dataset;
             data.forEach(function(d){ 
-
+                // for animation
                 d.Year = +d.Year;
+
+                //bubble area size
                 d.Population = +d.Population;
-                d.LifeExp = +d.LifeExp;
+
+                //for y axis
+                d.Global_Competitiveness_Index = +d.Global_Competitiveness_Index;
+                
+                //for x axis
                 d.GDP = +d.GDP;
                 d.Area = +d.Area;
-                })}
-                
-                // scaling the parameters
+
+                // console.log(d.Global_Competitiveness_Index);
+            });
+          }
+
+                // scaling the attribute values
                 var minGDP = d3.min(data, function(d) {
                               return +d.GDP; 
-                            })
+                            });
                 var maxGDP = d3.max(data, function(d) {
                               return +d.GDP; 
-                            })
-                var minLifeExp = d3.min(data, function(d) {
-                              return +d.LifeExp; 
-                            })
-                var maxLifeExp = d3.max(data, function(d) {
-                              return +d.LifeExp; 
-                            })
+                            });
+                var minGCI = d3.min(data, function(d) {
+                              return +d.Global_Competitiveness_Index; 
+                            });
+                var maxGCI = d3.max(data, function(d) {
+                              return +d.Global_Competitiveness_Index; 
+                            });
                 var minPop = d3.min(data, function(d) {
                               return +d.Population; 
-                            })
+                            });
                 var maxPop = d3.max(data, function(d) {
                               return +d.Population; 
-                            })
+                            });
                     
-              
-    </script>
+            //console.log(minGDP);
+
+            // scaling the attributes values for better readability
+
+            // x-axis log scale for GDP
+            xScale = d3.scaleLog();
+            xScale.domain([minGDP, maxGDP]);
+            xScale.range([(buffer*2), w-buffer]);
+                
+           // console.log(xScale);
+
+            // linear scale for for Global competitive index
+            yScale = d3.scaleLinear();
+            yScale.domain([minGCI, maxGCI]);
+            yScale.range([h-(buffer*2), (buffer*2)]);
+
+            // sqrt scale for bubble radius
+            rScale = d3.scaleSqrt(); 
+            rScale.domain([minPop, maxPop]);
+            rScale.range([2, ((w*h)/10000)]);
+
+            // linear scale for year
+            yearScale = d3.scaleLinear().domain([70, 336])
+                            .range([0,130]);
+
+    })</script>
 
    
     </body>
