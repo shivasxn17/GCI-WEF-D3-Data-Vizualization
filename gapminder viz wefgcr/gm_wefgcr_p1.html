@@ -1,0 +1,82 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    	<head>
+    		<meta charset="utf-8">
+    		<title>GM - Global Competitiveness Report</title>
+    		<script type="text/javascript" src="d3.js"></script>
+    		<style type="text/css">
+    		</style>
+
+    		<table border="0">
+            <tr>
+                <th rowspan="2"><div id="chart1"></div></th>
+                <td><div id="chart2" ></div></td>
+                </tr>
+                <tr>
+                <td><div id="chart3" ></div></td>
+            </tr>
+        </table>
+    	</head>
+
+    	
+        <body>
+            
+    		<script>
+        var data;
+    		var h = 600;
+    		var w = 1200;
+        var buffer = 20;
+        var svg;
+        var xScale;
+        var yScale;
+        var rScale;
+        var cScale;
+        var yearCount = 0;
+        var initialTimer;
+        var selected;
+        var font = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+            
+       
+            
+    		d3.csv("../data/GCI_CompleteData4.csv", function(error, dataset) {
+
+          if(error) {
+            console.log(error)
+          } else {
+
+            data = dataset;
+            data.forEach(function(d){ 
+
+                d.Year = +d.Year;
+                d.Population = +d.Population;
+                d.LifeExp = +d.LifeExp;
+                d.GDP = +d.GDP;
+                d.Area = +d.Area;
+                })}
+                
+                // scaling the parameters
+                var minGDP = d3.min(data, function(d) {
+                              return +d.GDP; 
+                            })
+                var maxGDP = d3.max(data, function(d) {
+                              return +d.GDP; 
+                            })
+                var minLifeExp = d3.min(data, function(d) {
+                              return +d.LifeExp; 
+                            })
+                var maxLifeExp = d3.max(data, function(d) {
+                              return +d.LifeExp; 
+                            })
+                var minPop = d3.min(data, function(d) {
+                              return +d.Population; 
+                            })
+                var maxPop = d3.max(data, function(d) {
+                              return +d.Population; 
+                            })
+                    
+              
+    </script>
+
+   
+    </body>
+    </html>
