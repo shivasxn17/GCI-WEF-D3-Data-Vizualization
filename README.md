@@ -2,9 +2,9 @@
 
 Description
 
-Hans Rosling is a data visualisation legend. His 2006 TED talk, The Best Stats You’ve Ever Seen, is one of the most viewed videos on the TED website(http://bit.ly/2doLzAY). An updated interactive version of the GapMinder World visualisation used in that demo is available at www.gapminder.org/tools. A poster of the visualisation is reproduced below. In this assignment we will create an information visualisations that is an homage to Hans Rosling.
+Hans Rosling is a data visualisation legend. His 2006 TED talk, The Best Stats You’ve Ever Seen, is one of the most viewed videos on the TED website(http://bit.ly/2doLzAY). An updated interactive version of the GapMinder World visualisation used in that demo is available at www.gapminder.org/tools. This information visualisations is an homage to Hans Rosling.
 
-In this created the a visualisation similar to the GapMinder World visualisation using d3.js. Your visualisation should be based on the World Economic  Forum  Global  Competitiveness  Report (http://reports.weforum.org/global-competitiveness-index-2017-2018/).
+In this created the a visualisation similar to the GapMinder World visualisation using d3.js. Visualisation is based on the World Economic  Forum  Global  Competitiveness  Report (http://reports.weforum.org/global-competitiveness-index-2017-2018/).
 Visualisation features:
 • A bubble plot representing the countries of the world
 o Countries of the world described by GDP and Global Competitive
