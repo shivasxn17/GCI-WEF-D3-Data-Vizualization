@@ -1,0 +1,636 @@
+	<!DOCTYPE html>
+	<html>
+	<head>
+	<meta charset="utf-8">
+	<title>GCI vs GDP D3GapMinder</title>
+	<link href="./themes/prism.css" rel="stylesheet" />
+	<link href="./themes/tas_style.css" rel="stylesheet" />
+	<link rel="stylesheet" href="./css/bootstrap.css">
+	<script type="text/javascript" src="./d3/d3.v4.js" charset="utf-8"></script>
+	<script type="text/javascript" src="./d3/d3.v3.js" charset="utf-8"></script>
+	<script src="./lib/prism.js" charset="utf-8"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-111636217-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	  gtag('config', 'UA-111636217-1');
+	</script>
+
+	<style type="text/css">
+	#table1{
+		text-align: center;
+		font-family: "Bariol Regular";
+		font-size: 15px;
+	}
+	h3 {
+		text-align: center;
+		font-family: "Bariol Regular";
+	}
+	p {
+		margin-left: 20px;
+		font-family: "Bariol Regular";
+		font-size: 20px;
+	}
+	.axis path,
+	.axis line {
+	    fill: none;
+	    stroke: black;
+	    shape-rendering: crispEdges;
+	}
+
+	.axis text {
+	    font-family: sans-serif;
+	    font-size: 11px;
+	}
+
+	div.years_buttons {
+	  top: 5px;
+	  left: 50px;
+	}
+
+	div.years_buttons div {
+	  background-color: rgb(251, 201, 127);
+	  padding: 3px;
+	  margin: 7px;
+	}	
+	</style>
+	</head>
+	<body>
+	<h2 align="center">Global Competitiveness Index vs GDP of the Countries across World 2007 - 2016</h2>
+
+	<!-- Div block for all the control buttons Begin, Stop, Search and Reset -->
+	<div align="center">
+
+		<button id="startButton" onclick="beginAnimation()" type="button" class="btn btn-success" style="margin-left: 2px;"> Begin </button>
+
+		<button id="pauseButton" onclick="stopAnimation()" type="button" class="btn btn-warning"> Stop </button>
+
+		<input style="height:30px;" type="text" id="enterYear" onkeypress="return runScript(event)" placeholder="Type Year as YYYY "/>
+
+		<button id="goButton" onsubmit="startYear()" onclick="startYear()" type="button" class="btn btn-primary"> Search </button></t>
+
+		<button id="resetButton" onclick="resetAll()" type="button" class="btn btn-reset" style="margin-left: 2px;"> Reset </button>
+
+	</div>
+
+
+	<!-- Div block for GapMinder Animation -->
+	<div id="oneId"  style="width: 98%; height: 100% border-top-width: 3px;
+	border-top-style: solid; border-left-width: 3px; border-left-style: solid; border-right-width: 3px; border-right-style: solid; border-bottom-width: 3px; border-bottom-style: solid; margin-top: 20px; margin-bottom: 20px; margin-right: 20px; margin-left: 20px; border-radius: 10px; border-color: grey; ">	
+	</div>
+
+	<!-- Div block for Comparison of Countries data -->
+	<div id="table1">
+		<h3 align="center" >Comparison of 12 Pillars of the Competitiveness Index for Multiple </h3>	
+	</div>
+
+	<script type="text/javascript">
+	//It handle the key press after entering the year. And does the validation
+	function runScript(e) {
+		 if (e.keyCode == 13) {
+		    	startYear();
+	    }
+		if (e.which != 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
+	        return false;
+	    }
+	}
+	</script>	
+
+	<script type="text/javascript" id = "demo_code">
+	// Margins setup
+	var margin = {top: 20, right: 30, bottom: 50, left: 60};
+
+	//Width and height
+	var outer_width = 1000;
+	var outer_height = 500;
+	var radius_min = 4;
+	var radius_max = 32;
+	var svg_width = outer_width - margin.left - margin.right;
+	var svg_height = outer_height - margin.top - margin.bottom;
+	var color = d3.scaleOrdinal(d3.schemeCategory10);
+	var start=true;
+	var mouseOverStart=true;
+	var font_text  = "Bariol Regular";
+
+	// The global data set object and global variables
+	var dataset;
+	var display_year = 2007;
+	var display_country="";
+
+	// functions for data filter as per specific year or country
+	function yearFilter(value){
+		return (value.Year == display_year);
+	}
+	function countryFilter(value){
+		return (value.Country == display_country);
+	}
+
+	function beginAnimation(){
+		// to start the gapminder animation
+		start=true;
+		if(display_country !== "")
+			emptySVGContainer(display_country);
+	}
+
+	//pausing the animation
+	function stopAnimation(){
+		start=false;
+	}
+
+	//resetting the animation
+	function resetAll(){
+		start=false;
+		var tables = d3.selectAll("table");
+		tables.remove();
+	}
+
+	//function to select specific year 
+	function startYear(){
+		var enterYear= document.getElementById("enterYear").value ;
+
+		// validation of the input year
+		if(enterYear.length != 4){
+			alert("please enter valid year. [" + enterYear + "] This is not a valid year.");
+			return;
+		} else if(enterYear < 2007 | enterYear > 2017 ){
+			alert("Please select year range between 2007 and 2017");
+			document.getElementById("enterYear").value="" ;
+			return;
+		}
+		display_year=enterYear;
+		generateVis();
+	}
+
+	//function to remove all the circles 
+	function emptySVGContainer(display_country){
+		var circles = svg.selectAll("circle")
+		 				 .data(dataset, function key(d) {
+		 						if(d.Country == display_country) {
+		 							return d.Country;
+		 						}
+						   });
+		circles.exit().transition()
+		.duration(100).attr("r", 0)
+		.ease(d3.easeLinear)
+		.remove();
+	}
+
+	//xScales, yScales, rScales for gapminder svg
+	var xScale = d3.scaleLog().range([0,svg_width]);
+	var yScale = d3.scaleLinear().range([svg_height,0]);
+	var rScale = d3.scaleSqrt().range([radius_min,radius_max]);	
+
+
+	// x-axis scale for gapminder svg
+	var xAxis = d3.axisBottom().scale(xScale)
+					.ticks(6, d3.format("s"));
+
+	//y-axis scale for gapminder svg
+	var yAxis = d3.axisLeft().scale(yScale).ticks(10);
+								  
+
+	// Main SVG Canvas to attach all animation visualizations
+	var svg = d3.select("#oneId").append("svg")
+			.attr("width", svg_width + margin.left + margin.right)
+			.attr("height", svg_height + margin.top + margin.bottom)
+			.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+	// Legends SVG Canvas to attach continent region legends as per color palette
+	var legends_svg = d3.select("#oneId").append("svg")
+			.attr("width", 400).attr("height", 400)
+			.append("g")
+			.attr("transform", "translate(" + (-50) + "," + (-40) + ")");
+
+    legends_svg.append("circle").attr("cx", 80).attr("cy", 60).attr("r", 13).attr("fill","#9467bd");
+    legends_svg.append("circle").attr("cx", 80).attr("cy", 90).attr("r", 13).attr("fill","green");
+    legends_svg.append("circle").attr("cx", 80).attr("cy", 120).attr("r", 13).attr("fill","#2E86C1");
+    legends_svg.append("circle").attr("cx", 80).attr("cy", 150).attr("r", 13).attr("fill","#8c564b");
+    legends_svg.append("circle").attr("cx", 80).attr("cy", 180).attr("r", 13).attr("fill","#ff7f0e");
+    legends_svg.append("circle").attr("cx", 80).attr("cy", 210).attr("r", 13).attr("fill","#D62728");
+    legends_svg.append("circle").attr("cx", 80).attr("cy", 240).attr("r", 13).attr("fill","#FF33CC");
+
+    legends_svg.append("text").attr("x", 105).attr("y",94 ).style("text-anchor", "start").attr("fill","black").text("Sub-Saharan Africa");
+    legends_svg.append("text").attr("x", 105).attr("y",125 ).style("text-anchor", "start").attr("fill","black").text("Emerging & Developing Europe");
+    legends_svg.append("text").attr("x", 105).attr("y",156 ).style("text-anchor", "start").attr("fill","black").text("Advanced Economies, Europe & North America");
+    legends_svg.append("text").attr("x", 105).attr("y",187 ).style("text-anchor", "start").attr("fill","black").text("Middle East, North Africa, & Pakistan");
+    legends_svg.append("text").attr("x", 105).attr("y",218 ).style("text-anchor", "start").attr("fill","black").text("Latin America & the Caribbean");
+    legends_svg.append("text").attr("x", 105).attr("y",67 ).style("text-anchor", "start").attr("fill","black").text("Commonwealth of Independent States,Eurasia");
+    legends_svg.append("text").attr("x", 105).attr("y",247 ).style("text-anchor", "start").attr("fill","black").text("Emerging and Developing Asia");
+                  
+
+	// Year animation view in background 			
+	svg.append("text").attr("id","svg_year")
+		.attr("x",((svg_width - margin.left - margin.right - 600))/2)
+		.attr("y", 90 + svg_height/2)
+		.style("fill","#999999").style("stroke", "#000000")
+		.attr("font-family", "Kameron").style("font-size", "320px")
+		.style("opacity", "0.4")
+		.text(display_year);
+
+	// x-axis label for the income(gdp) in gapminder animation
+    svg.append("text").attr("x", svg_width / 2 )
+        .attr("y", svg_height + margin.bottom - 5)
+        .style("text-anchor", "middle")
+        .attr("font-family", font_text).attr("fill", "#073F59")
+        .attr("font-size", 22).text("Income");
+    
+
+    // mini-label for Global competitive score on y-axis
+    svg.append("text").attr("text-anchor", "end")
+        .text("Score")
+        .attr("x", 10-(svg_width/50)).attr("y", margin.top*1.5)
+        .attr("font-size", 16).attr("font-family", font_text)
+        .attr("fill", "#073F59").attr("transform", "rotate(-90)");
+
+   // mini-label for GDP on x-axis
+    svg.append("text").attr("text-anchor", "end")
+        .text("per person (GDP/capita,PPPS inflation-adjusted)")
+        .attr("x", svg_width-(svg_width/40)).attr("y", svg_height - (svg_height/22))
+        .attr("font-size", 13).attr("font-family", font_text)
+        .attr("fill", "#073F59");
+
+    //  main-label for GCI on y-axis
+   	svg.append("text")
+	   .attr("transform", "rotate(-90)")
+	   .attr("y", -15 - margin.right)
+	   .attr("x", 0 - (svg_height / 2))
+	   .attr("dy", "12px")
+	   .attr("font-size", 21)
+	   .attr("font-family", "Bariol Regular")
+	   .style("text-anchor", "middle")
+	   .attr("fill", "#073F59")
+	   .text("Global Competitiveness Index");
+
+   
+	// function to generate gridlines on x and y axis
+	// in gapminder animation
+	function make_x_gridlines() {   
+	  return d3.axisBottom(xScale);
+	}
+
+	function make_y_gridlines() {   
+	  return d3.axisLeft(yScale);
+	}            
+
+	// add the X gridlines
+	svg.append("g").attr("class", "grid")
+	  .attr("transform", "translate(0," + svg_height + ")")
+	  .call(make_x_gridlines()
+	      .tickSize(-svg_height)
+	      .tickFormat("")
+	  ).style("opacity", 0.2);
+
+	// add the Y gridlines
+	svg.append("g").attr("class", "grid")
+	  .call(make_y_gridlines()
+	      .tickSize(-svg_width)
+	      .tickFormat("")
+	  ).style("opacity", 0.2);
+			
+
+	function generateVis(){
+		// data filtering as per selected year
+		var filtered_data_for_year = dataset.filter(yearFilter);
+			
+		// data join step
+		var circles = svg.selectAll("circle")
+						 .data(filtered_data_for_year, function key(d) {
+										return d.Country; });
+		
+	 	// Update the display of existing elements to match new data
+	 	// Perform a data join and add circles to the chart	
+		// update on circles elements	
+
+		circles.transition().duration(400)
+				.ease(d3.easeLinear)
+				.attr("cx", function(d){ return xScale(d.GDP); })
+				.attr("cy", function(d){ return yScale(d.Global_Competitiveness_Index); })
+				.attr("r", function(d){ return rScale(d.Population); })
+				.style("fill", function (d){ return color(d.Region); })
+				.attr('fill-opacity', 1).style("stroke", "black")
+				.style("stroke-width", 0.7).style("opacity", 0.9);
+		
+		//adding tooltip
+		circles.append("title")
+			.text(function(d) { return  "Country: " + d.Country +  "\nYear: "+ d.Year + "\nGDP: "+ Math.round(d.GDP/100)/10 + " K"  + "\nPopulation: "+ Math.round(d.Population/100000)/10 + " millons" + "\nGCI: "+ d.Global_Competitiveness_Index + "\nRegion: "+ d.Region; });
+							
+	
+	 	// enter selection to create new elements from dataset
+	 	// data join step and add circles to the chart
+		circles.enter().append("circle").transition()
+			.duration(300)
+			.attr("cx", function(d){
+					return xScale(d.GDP);  })
+			.attr("cy", function(d){
+					return yScale(d.Global_Competitiveness_Index); })
+			.attr("r", function(d){
+					return rScale(d.Population); })
+			.style("fill", function (d){ return color(d.Region); })
+			.style("stroke", "black")
+			.style("stroke-width", 0.7);
+
+		//appending title
+		circles.append("title")
+			.text(function(d) {return  "Country: " + d.Country +  "\nYear: "+ d.Year + "\nGDP: "+ Math.round(d.GDP/100)/10 + " K"  + "\nPopulation: "+ Math.round(d.Population/100000)/10 + " millons" + "\nGCI: "+ d.Global_Competitiveness_Index + "\nRegion: "+ d.Region;   });
+		
+		//click event for tracing the country track for all the years
+		circles.on("click", function(d){
+			start=false;
+			display_country=d.Country;
+			trailCountry(d.Country);
+		});
+
+		circles.on("mouseover", function(d){
+			d3.select(this).style("stroke", "black")
+				.style("stroke-width", 2)
+				.attr('fill-opacity', 1);
+		});
+
+		circles.on("mouseout", function(d){
+			d3.select(this)
+				.style("stroke", "black")
+				.style("stroke-width", 0.7)
+				.attr('fill-opacity', 1);
+			d3.select(this).select("title").remove();
+		});
+		
+		// exit selection and clearing circles
+		// Remove elements that not longer have a matching data eleement
+		 circles.exit().transition().transition()
+				.duration(1000).attr("r", 0)
+				.ease(d3.easeLinear)
+				.remove();
+		
+		// to update the year with data
+		d3.select("#svg_year").text(display_year);
+	}
+
+	// Load the file data.csv and generate a visualisation based on it
+	d3.csv("./data/GCI_CompleteData4.csv", function(error, data){
+		// handle any data loading errors
+		if(error){
+			console.log("Something went wrong");
+			console.log(error);
+		}else{     
+			// convert variable to numeric type or string type
+			data.forEach(function(d){ 
+						d.Country = d.Country; 
+						d.Year = +d.Year; 
+						d.Population = +d.Population; 
+						d.Global_Competitiveness_Index = +d.Global_Competitiveness_Index; 
+						d.GDP = +d.GDP;
+					});   		
+
+			// Assign  the data object loaded to the global dataset variable
+			dataset = data;
+
+			//calculating the domain range max min from given dataset
+			var max_GCI = d3.max(dataset, function(d) { 
+							return d.Global_Competitiveness_Index;});
+			var min_GCI = d3.min(dataset, function(d) { 
+							return d.Global_Competitiveness_Index;});
+			var max_GDP = d3.max(dataset, function(d) { return d.GDP;});
+			var min_GDP = d3.min(dataset, function(d) { return d.GDP;});
+			var max_Population = d3.max(dataset, function(d) { return d.Population;} );
+			var min_Population = d3.min(dataset, function(d) { return d.Population;} );
+
+			// Set the domains of the x and y scales using the data
+			xScale.domain([min_GDP, max_GDP]);
+			yScale.domain([min_GCI, max_GCI]);
+			rScale.domain([min_Population, max_Population]);
+
+			// Create the x-axis
+			svg.append("g").attr("class", "axis").attr("id", "x-axis")
+				.attr("transform", "translate(0," + svg_height + ")")
+				.call(xAxis);
+				
+			// Create the y axis
+			svg.append("g").attr("class", "axis").attr("id", "y-axis")
+				.call(yAxis).append("text")
+				.attr("transform", "rotate(90)")
+				.attr("y", 6)
+				.attr("dy", ".70em")
+				.style("text-anchor", "end")
+				.text("Global_Competitiveness_Index");
+
+			//setting the interval for animation purpose and handled the cyclic flow of year
+			 setInterval(function() {
+				if(start==true && mouseOverStart == true){
+					if(display_year > 2016){
+						display_year = 2007;
+					}
+	  				generateVis();	
+	  				display_year = parseInt(display_year) + 1;
+				}
+			}, 1000); 
+		}
+	});
+		
+	function trailCountry(display_country){
+	  	// data filtered as per selected country
+		var filtered_dataset_for_country = dataset.filter(countryFilter);
+
+	  	// data join step new data with old elements, if any.
+		var circles = svg.selectAll("circle")
+						.data(filtered_dataset_for_country, function key(d) {
+							return d.Country;
+						});
+
+	  	var filtered_foryear = filtered_dataset_for_country.filter(yearFilter);
+	  	tabulate(filtered_foryear,dataset.columns);
+
+	  	// remove bubbles
+		circles.exit()
+			.transition().duration(400)
+			.attr("r", 0).ease(d3.easeLinear)
+			.remove();
+		
+		genVizDup();
+
+		circles.enter()
+			.append("circle")
+			.on("mouseover", function() {
+									d3.select(this)
+										.append("title")
+										.text(function(d) { 
+											return  "Country: " + d.Country +  "\nYear: "+ d.Year + "\nGDP: "+ Math.round(d.GDP/100)/10 + " K"  + "\nPopulation: "+ Math.round(d.Population/100000)/10 + " millons" + "\nGCI: "+ d.Global_Competitiveness_Index + "\nRegion: "+ d.Region ;  });
+									d3.select(this)
+										.attr('fill-opacity', 1)
+										.style("stroke", "black")
+										.style("stroke-width", 2);
+										})
+			.on("mouseout", function() {
+										d3.select(this)
+										.attr('fill-opacity', 0.8)
+										.style("stroke", "grey")
+										.style("stroke-width", 1);
+										})
+			.attr("cx", function(d) {
+								if(d.Country == display_country) {
+						   			return xScale(d.GDP); }
+						   })
+			.attr("cy", function(d) {
+								if(d.Country == display_country) {
+						   			return yScale(d.Global_Competitiveness_Index);
+						   		}
+						   })
+			.attr("r", function(d) {
+								if(d.Country == display_country) {
+						   			return rScale(d.Population);
+						   		}
+						   })
+			.attr("fill", function(d) {return color(d.Region)})
+			.style("stroke", "grey")
+			.style("stroke-width", 1)
+			.attr('fill-opacity', 0.8);
+
+		
+		circles.append("title")
+		.text(function(d) { return  "Country: " + d.Country +  "\nYear: "+ d.Year + "\nGDP: "+ Math.round(d.GDP/100)/10 + " K"  + "\nPopulation: "+ Math.round(d.Population/100000)/10 + " millons" + "\nGCI: "+ d.Global_Competitiveness_Index + "\nRegion: "+ d.Region   });
+	}
+
+	// to generate tabular visualization for selected countries by click
+	var tabulate = function (data,columns) {	
+	    var table = d3.select('#table1').append('table').attr("class", "table table-bordered");
+	    var thead = table.append('thead');
+		var tbody = table.append('tbody');
+
+		columns = columns.slice(0, 15);
+		thead.append('tr').selectAll('th')
+		    .data(columns)
+		    .enter()
+		  	.append('th').text(function (column) { 
+
+		  		if (column == 'Income group') {
+		  			return 'IG';
+		  		} else if (column == '1st_pillar_Institutions') {
+		  			return 'Institutions'
+		  		} else if (column == '2nd_pillar_Infrastructure') {
+		  			return 'Infra';
+		  		}else if (column == '3rd_pillar_Macroeconomic_environment') {
+		  			return 'MacroEconomicEnv';
+		  		}else if (column == '4th_pillar_Health_and_primary_education') {
+		  			return 'Health & Edu';
+		  		}else if (column == '5th_pillar_Higher_education_and_training') {
+		  			return 'Higher Edu';
+		  		}else if (column == '6th_pillar_Goods_market_efficiency') {
+		  			return 'Goods Market Eff';
+		  		}else if (column == '7th_pillar_Labor_market_efficiency') {
+		  			return 'Labor Market Eff';
+		  		}else if (column == '8th_pillar_Financial_market_development') {
+		  			return 'Financial Market Dev';
+		  		}else if (column == '9th_pillar_Technological_readiness') {
+		  			return 'Tech Readiness';
+		  		}else if (column == '10th_pillar_Market_size') {
+		  			return 'Market Size';
+		  		}else if (column == '11th_pillar_Business_sophistication_') {
+		  			return 'Business Sophistication';
+		  		}else if (column == '12th_pillar_Innovation') {
+		  			return 'Innovation';
+		  		}else if (column == 'Global_Competitiveness_Index') {
+		  			return 'GCI';
+		  		}
+
+		  		return column ;
+		  	});
+
+		var rows = tbody.selectAll('tr').data(data)
+		    .enter().append('tr');
+
+		var column_names = tbody.selectAll('tr')
+		    .data(data).enter().append('tr');
+
+		var cells = rows.selectAll('td')
+		    .data(function(row) {
+		    	return columns.map(function (column) {
+		    		return { column: column, value: row[column] };
+		      });
+	      })
+	      .enter()
+	      .append('td')
+	      .text(function (d) { 
+	      	if (d.column == "Country" | d.column == "Year") {
+	      		return d.value;
+	      	} else {
+	      		return Math.round(d.value * 1000) / 1000;
+	      	}
+	      });
+
+	  return table;
+	};
+
+	//This generateViz function duplicate to input the enter events
+	function genVizDup(){
+		//data filtered for specific year
+		var filtered_dataset_for_year2 = dataset.filter(yearFilter);
+
+	  	// data join step
+		var circles = svg.selectAll("circle")
+						 .data(filtered_dataset_for_year2, function key(d) {
+								return d.Country;
+	   					 });
+
+	  	// data join and update step to insert bubbles in svg
+		circles.transition().duration(200)
+			.ease(d3.easeLinear)
+			.attr("cx", function(d){
+							return xScale(d.GDP); })
+			.attr("cy", function(d){
+							return yScale(d.Global_Competitiveness_Index); })
+			.attr("r", function(d){
+							return rScale(d.Population); })
+			.style("fill", function (d){ return color(d.Region);})
+			.attr('fill-opacity', 0.2);
+		
+		circles.append("title")
+			.text(function(d) { return  "Country: " + d.Country +  "\nYear: "+ d.Year + "\nGDP: "+ Math.round(d.GDP/100)/10 + " K"  + "\nPopulation: "+ Math.round(d.Population/100000)/10 + " millons" + "\nGCI: "+ d.Global_Competitiveness_Index + "\nRegion: "+ d.Region;   });
+								
+	  	// data join step and insert bubbles to chart
+		circles.enter().append("circle")
+			.attr("cx", function(d){
+							return xScale(d.GDP); })
+			.attr("cy", function(d){
+							return yScale(d.Global_Competitiveness_Index); })
+			.attr("r", function(d){
+							return rScale(d.Population); })
+			.style("fill", function (d){ return color(d.Region); })
+			.attr('fill-opacity', 0.2);
+		
+		// adding tooltip
+		circles.append("title")
+			.text(function(d) { return  "Country: " + d.Country +  "\nYear: "+ d.Year + "\nGDP: "+ Math.round(d.GDP/100)/10 + " K"  + "\nPopulation: "+ Math.round(d.Population/100000)/10 + " millons" + "\nGCI: "+ d.Global_Competitiveness_Index + "\nRegion: "+ d.Region ;  });
+
+		//trail history of country when clicked over
+		circles.on("click", function(d){
+			start=false;
+			display_country=d.Country;
+			trailCountry(d.Country);
+		});
+		circles.on("mouseover", function(d){
+			d3.select(this)
+				.style("stroke", "black")
+				.style("stroke-width", 2);
+		});
+		circles.on("mouseout", function(d){
+			 d3.select(this)
+				.style("stroke", "black")
+				.style("stroke-width", 0.8);
+			d3.select(this).select("title").remove();
+		});
+	}
+	</script>
+	<p > <b>Guidelines:</b> 
+	</br>
+		1. Animation will start automatically as soon as page loads.</br>
+		2. Control the animation through <b>[Begin]</b> and <b>[Stop]</b> button.</br>
+		3. To start from specific year or look at specific year's data, type the year and click on [Search] button</br>
+		4. To view the trace history of the country over the years click on the country's bubble.</br>
+		5. To view the details of the particular country, hover the mouse pointer on that country's bubble.</br>
+		6. Details are coverted to 3 decimals for readability so they are not exact.</br>
+		7. To reset the comparison of multiple countries click <b>[Reset]</b> button.
+	</p>
+	</body>
+	</html>
