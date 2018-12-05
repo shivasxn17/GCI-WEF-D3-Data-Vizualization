@@ -18,14 +18,37 @@
 	</script>
 
 	<style type="text/css">
+
+	#team_names{
+		text-align: center;
+		font-family: "Bariol Regular";
+		font-size: 18px;
+		letter-spacing: 2px;
+		font-weight: bold;
+		margin: 10px;
+	}
+	#control_div{
+		 
+	}
 	#table1{
 		text-align: center;
 		font-family: "Bariol Regular";
 		font-size: 15px;
 	}
+	h2  {
+		text-align: center;
+		letter-spacing: 3px;
+		text-shadow: 1px 1px grey;
+		font-family: "Bariol Regular";
+		 text-decoration: underline;
+	}
 	h3 {
 		text-align: center;
+		letter-spacing: 3px;
+		text-shadow: 1px 1px grey;
 		font-family: "Bariol Regular";
+	}
+	body {
 	}
 	p {
 		margin-left: 20px;
@@ -57,10 +80,15 @@
 	</style>
 	</head>
 	<body>
-	<h2 align="center">Global Competitiveness Index vs GDP of the Countries across World 2007 - 2016</h2>
+	<h2 >Information Visualization Assignment 2 - Channeling Hans</h2>
+	<div id = "team_names"> Shivam Saxena(18200022) and Jatin Jaitley(18200075)</div>
 
+	<!-- Div block for GapMinder Animation -->
+	<div id="oneId"  style="width: 98%; height: 100% border-top-width: 3px;
+	border-top-style: solid; border-left-width: 3px; border-left-style: solid; border-right-width: 3px; border-right-style: solid; border-bottom-width: 3px; border-bottom-style: solid; margin-top: 20px; margin-bottom: 20px; margin-right: 20px; margin-left: 20px; border-radius: 10px; border-color: grey; ">	
+	<h3 >Part 1- Global Competitiveness Index vs GDP of the Countries across World 2007 - 2016</h3>
 	<!-- Div block for all the control buttons Begin, Stop, Search and Reset -->
-	<div align="center">
+	<div id = "control_div" align="center">
 
 		<button id="startButton" onclick="beginAnimation()" type="button" class="btn btn-success" style="margin-left: 2px;"> Begin </button>
 
@@ -73,16 +101,11 @@
 		<button id="resetButton" onclick="resetAll()" type="button" class="btn btn-reset" style="margin-left: 2px;"> Reset </button>
 
 	</div>
-
-
-	<!-- Div block for GapMinder Animation -->
-	<div id="oneId"  style="width: 98%; height: 100% border-top-width: 3px;
-	border-top-style: solid; border-left-width: 3px; border-left-style: solid; border-right-width: 3px; border-right-style: solid; border-bottom-width: 3px; border-bottom-style: solid; margin-top: 20px; margin-bottom: 20px; margin-right: 20px; margin-left: 20px; border-radius: 10px; border-color: grey; ">	
 	</div>
 
 	<!-- Div block for Comparison of Countries data -->
 	<div id="table1">
-		<h3 align="center" >Comparison of 12 Pillars of the Competitiveness Index for Multiple </h3>	
+		<h3 align="center">Part 2 - Comparison of 12 Pillars of the Competitiveness Index for Multiple Countries </h3>	
 	</div>
 
 	<script type="text/javascript">
@@ -212,13 +235,13 @@
     legends_svg.append("circle").attr("cx", 80).attr("cy", 210).attr("r", 13).attr("fill","#D62728");
     legends_svg.append("circle").attr("cx", 80).attr("cy", 240).attr("r", 13).attr("fill","#FF33CC");
 
-    legends_svg.append("text").attr("x", 105).attr("y",94 ).style("text-anchor", "start").attr("fill","black").text("Sub-Saharan Africa");
-    legends_svg.append("text").attr("x", 105).attr("y",125 ).style("text-anchor", "start").attr("fill","black").text("Emerging & Developing Europe");
-    legends_svg.append("text").attr("x", 105).attr("y",156 ).style("text-anchor", "start").attr("fill","black").text("Advanced Economies, Europe & North America");
-    legends_svg.append("text").attr("x", 105).attr("y",187 ).style("text-anchor", "start").attr("fill","black").text("Middle East, North Africa, & Pakistan");
-    legends_svg.append("text").attr("x", 105).attr("y",218 ).style("text-anchor", "start").attr("fill","black").text("Latin America & the Caribbean");
-    legends_svg.append("text").attr("x", 105).attr("y",67 ).style("text-anchor", "start").attr("fill","black").text("Commonwealth of Independent States,Eurasia");
-    legends_svg.append("text").attr("x", 105).attr("y",247 ).style("text-anchor", "start").attr("fill","black").text("Emerging and Developing Asia");
+    legends_svg.append("text").attr("x", 105).attr("y",94 ).style("text-anchor", "start").attr("font-family", font_text).attr("fill","black").text("Sub-Saharan Africa");
+    legends_svg.append("text").attr("x", 105).attr("y",125 ).style("text-anchor", "start").attr("font-family", font_text).attr("fill","black").text("Emerging & Developing Europe");
+    legends_svg.append("text").attr("x", 105).attr("y",156 ).style("text-anchor", "start").attr("font-family", font_text).attr("fill","black").text("Advanced Economies, Europe & North America");
+    legends_svg.append("text").attr("x", 105).attr("y",187 ).style("text-anchor", "start").attr("font-family", font_text).attr("fill","black").text("Middle East, North Africa, & Pakistan");
+    legends_svg.append("text").attr("x", 105).attr("y",218 ).style("text-anchor", "start").attr("font-family", font_text).attr("fill","black").text("Latin America & the Caribbean");
+    legends_svg.append("text").attr("x", 105).attr("y",67 ).style("text-anchor", "start").attr("font-family", font_text).attr("fill","black").text("Commonwealth of Independent States,Eurasia");
+    legends_svg.append("text").attr("x", 105).attr("y",247 ).style("text-anchor", "start").attr("font-family", font_text).attr("fill","black").text("Emerging and Developing Asia");
                   
 
 	// Year animation view in background 			
@@ -374,7 +397,17 @@
 		if(error){
 			console.log("Something went wrong");
 			console.log(error);
-		}else{     
+		}else{  
+
+			// filtering is important as it is affecting
+
+			// filtering countries missing values of global competitive index   
+			// data =  data.filter(function(d){
+			//         if(d.Global_Competitiveness_Index != ""){
+			//             return true; 	}
+			//         return false;
+			//     });
+
 			// convert variable to numeric type or string type
 			data.forEach(function(d){ 
 						d.Country = d.Country; 
@@ -505,25 +538,25 @@
 		  	.append('th').text(function (column) { 
 
 		  		if (column == 'Income group') {
-		  			return 'IG';
+		  			return 'Income Group';
 		  		} else if (column == '1st_pillar_Institutions') {
-		  			return 'Institutions'
+		  			return 'Institutions';
 		  		} else if (column == '2nd_pillar_Infrastructure') {
-		  			return 'Infra';
+		  			return 'Infrastructure';
 		  		}else if (column == '3rd_pillar_Macroeconomic_environment') {
-		  			return 'MacroEconomicEnv';
+		  			return 'Macroeconomic Environment';
 		  		}else if (column == '4th_pillar_Health_and_primary_education') {
-		  			return 'Health & Edu';
+		  			return 'Health & Primary Education';
 		  		}else if (column == '5th_pillar_Higher_education_and_training') {
-		  			return 'Higher Edu';
+		  			return 'Higher Education & Training';
 		  		}else if (column == '6th_pillar_Goods_market_efficiency') {
-		  			return 'Goods Market Eff';
+		  			return 'Goods Market Efficiency';
 		  		}else if (column == '7th_pillar_Labor_market_efficiency') {
-		  			return 'Labor Market Eff';
+		  			return 'Labor Market Efficiency';
 		  		}else if (column == '8th_pillar_Financial_market_development') {
-		  			return 'Financial Market Dev';
+		  			return 'Financial Market Development';
 		  		}else if (column == '9th_pillar_Technological_readiness') {
-		  			return 'Tech Readiness';
+		  			return 'Technological Readiness';
 		  		}else if (column == '10th_pillar_Market_size') {
 		  			return 'Market Size';
 		  		}else if (column == '11th_pillar_Business_sophistication_') {
@@ -531,7 +564,7 @@
 		  		}else if (column == '12th_pillar_Innovation') {
 		  			return 'Innovation';
 		  		}else if (column == 'Global_Competitiveness_Index') {
-		  			return 'GCI';
+		  			return 'Global Competitiveness Index';
 		  		}
 
 		  		return column ;
