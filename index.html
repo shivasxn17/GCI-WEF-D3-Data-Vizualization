@@ -138,6 +138,7 @@
 
 	// The global data set object and global variables
 	var dataset;
+	var dataset_columns;
 	var display_year = 2007;
 	var display_country="";
 
@@ -166,6 +167,7 @@
 		start=false;
 		var tables = d3.selectAll("table");
 		tables.remove();
+		beginAnimation();
 	}
 
 	//function to select specific year 
@@ -399,23 +401,28 @@
 			console.log(error);
 		}else{  
 
-			// filtering is important as it is affecting
+			dataset_columns = data.columns;
 
-			// filtering countries missing values of global competitive index   
-			// data =  data.filter(function(d){
-			//         if(d.Global_Competitiveness_Index != ""){
-			//             return true; 	}
-			//         return false;
-			//     });
+			
+			// filtering is important as it is affecting y scaling
+			//filtering countries missing values of global competitive index   
+			data =  data.filter(function(d){
+			        if(d.Global_Competitiveness_Index != ""){
+			            return true; 	
+			        }
+			        return false;
+			    });
+
+
 
 			// convert variable to numeric type or string type
 			data.forEach(function(d){ 
 						d.Country = d.Country; 
 						d.Year = +d.Year; 
-						d.Population = +d.Population; 
+						d.Population = +d.Population;
 						d.Global_Competitiveness_Index = +d.Global_Competitiveness_Index; 
 						d.GDP = +d.GDP;
-					});   		
+					});   
 
 			// Assign  the data object loaded to the global dataset variable
 			dataset = data;
@@ -473,7 +480,7 @@
 						});
 
 	  	var filtered_foryear = filtered_dataset_for_country.filter(yearFilter);
-	  	tabulate(filtered_foryear,dataset.columns);
+	  	tabulate(filtered_foryear,dataset_columns);
 
 	  	// remove bubbles
 		circles.exit()
