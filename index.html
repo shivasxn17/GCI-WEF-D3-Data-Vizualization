@@ -84,7 +84,7 @@
 	<div id = "team_names"> Shivam Saxena(18200022) and Jatin Jaitley(18200075)</div>
 
 	<!-- Div block for GapMinder Animation -->
-	<div id="oneId"  style="width: 98%; height: 100% border-top-width: 3px;
+	<div id="gapminderDiv"  style="width: 98%; height: 100% border-top-width: 3px;
 	border-top-style: solid; border-left-width: 3px; border-left-style: solid; border-right-width: 3px; border-right-style: solid; border-bottom-width: 3px; border-bottom-style: solid; margin-top: 20px; margin-bottom: 20px; margin-right: 20px; margin-left: 20px; border-radius: 10px; border-color: grey; ">	
 	<h3 >Part 1- Global Competitiveness Index vs GDP of the Countries across World 2007 - 2016</h3>
 	<!-- Div block for all the control buttons Begin, Stop, Search and Reset -->
@@ -206,7 +206,6 @@
 	var yScale = d3.scaleLinear().range([svg_height,0]);
 	var rScale = d3.scaleSqrt().range([radius_min,radius_max]);	
 
-
 	// x-axis scale for gapminder svg
 	var xAxis = d3.axisBottom().scale(xScale)
 					.ticks(6, d3.format("s"));
@@ -216,7 +215,7 @@
 								  
 
 	// Main SVG Canvas to attach all animation visualizations
-	var svg = d3.select("#oneId").append("svg")
+	var svg = d3.select("#gapminderDiv").append("svg")
 			.attr("width", svg_width + margin.left + margin.right)
 			.attr("height", svg_height + margin.top + margin.bottom)
 			.append("g")
@@ -224,7 +223,7 @@
 
 
 	// Legends SVG Canvas to attach continent region legends as per color palette
-	var legends_svg = d3.select("#oneId").append("svg")
+	var legends_svg = d3.select("#gapminderDiv").append("svg")
 			.attr("width", 400).attr("height", 400)
 			.append("g")
 			.attr("transform", "translate(" + (-50) + "," + (-40) + ")");
