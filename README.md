@@ -1,4 +1,4 @@
-# wef-gcr17-data-viz
+# Global Competitive Index by World Economic Forum Gapminder D3 based Data Vizualization
 
 Description
 
@@ -13,8 +13,7 @@ Visualisation features:
 * Appropriate use of colour
 * Country name labels
 * Ability to view data for a particular year
-* Ability to animate the change in country statistics from year to year (2008
-– 2017)
+* Ability to animate the change in country statistics from year to year (2008 – 2017)
 
 The data required to drive this visualisation is available in the folder data/GCI_CompleteData2.csv. The fields in this file are as follows:
 * Country: The country name
