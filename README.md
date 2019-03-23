@@ -1,6 +1,6 @@
 # Global Competitive Index by World Economic Forum Gapminder D3 based Data Vizualization
 
-Hosted - https://rex17.github.io/GCI-WEF-D3-Data-Vizualization/
+Hosted - https://shivamsaxena17493.github.io/GCI-WEF-D3-Data-Vizualization/
 
 Description
 
